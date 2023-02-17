@@ -1,3 +1,8 @@
+from operator import mod
 from django.db import models
+from datetime import datetime
 
-# Create your models here.
+
+class Collection(models.Model):
+    filename = models.CharField(max_length=48)
+    created_at = models.DateTimeField(default=datetime.now)
