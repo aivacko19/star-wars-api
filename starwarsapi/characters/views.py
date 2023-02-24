@@ -1,3 +1,7 @@
 from django.shortcuts import render
 
-# Create your views here.
+from characters.models import Collection
+
+def index(request, **kwargs):
+    collections = Collection.objects.all()
+    return render(request, "index.html", {"title": "Collections", "collections": collections})

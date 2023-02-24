@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+    </head>
+    <body>
+        <div class="container">
+
+        <ul class="nav bg-warning fs-5">
+            <li class="nav-item text-large">
+            <a class="nav-link link-dark" href="/"><strong>Star Wars</strong> Explorer</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link link-info" href="/collections">Collections</a>
+            </li>
+        </ul>
+
+        <br/><br/>
+
+        {% block content %}
+        {% endblock %}
+        </div>
+    </body>
+</html>

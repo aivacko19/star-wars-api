@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h2>{{ title }} <button type="button" class="btn btn-success">Fetch</button></h2>
+<ul class="list-group">
+{% for collection in collections %}
+<li class="list-group-item">
+    <a href="{{ collection.get_absolute_url }}">
+    {{ collection.filename }}
+    </a>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}
