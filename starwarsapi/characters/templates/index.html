@@ -3,7 +3,10 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<h2>{{ title }} <button type="button" class="btn btn-success">Fetch</button></h2>
+<form action="fetch/" method="POST">
+    {% csrf_token %}
+    <h2>{{ title }} <button name="btn" value="fetch" role="button" class="btn btn-success">Fetch</a></h2>
+</form>
 <ul class="list-group">
 {% for collection in collections %}
 <li class="list-group-item">

@@ -5,4 +5,5 @@ from characters import views
 
 urlpatterns = [
     path('collections/', views.index, name="index"),
+    path('collections/fetch/', views.fetch, name="fetch"),
 ]

@@ -3,3 +3,6 @@
 
 # Ignore virutal environment
 venv
+
+# Ignore csv collections
+collections
