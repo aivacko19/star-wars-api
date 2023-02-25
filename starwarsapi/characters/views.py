@@ -4,51 +4,79 @@ from django.conf import settings
 
 import requests
 from datetime import datetime
+import petl
 import csv
 
 from characters.models import Collection
 
 
-SWAPI_PEOPLE_URL = "https://swapi.dev/api/people"
-
 
 @require_http_methods(['GET'])
 def index(request, **kwargs):
-    collections = Collection.objects.all()
+    collections = Collection.objects.order_by('-created_at')
     return render(request, "index.html", {"title": "Collections", "collections": collections})
 
 
 @require_http_methods(['POST'])
 def fetch(request, **kwargs):
 
-    r = requests.get(SWAPI_PEOPLE_URL).json()
+    url = "https://swapi.dev/api/people"
+    r = requests.get(url).json()
     
     # Ignore fetch and return if result is empty
     if not r['results']:
         return redirect('index')
 
+    # Prepare collection entry fields
     dt = datetime.now()
-    filename = dt.strftime("%Y%m%d%H%M%S.csv")
+    filename = dt.strftime("%Y%m%d%H%M%S")
+    name = dt.strftime("%b. %d, %Y, %I:%M %p")
 
-    # Add verbose name field to collection
-    # name = dt.strftime("%b. %d, %Y, %I:%M %p")
+    field_names = [
+        'name',
+        'height',
+        'mass',
+        'hair_color',
+        'skin_color',
+        'eye_color', 
+        'birth_year',
+        'gender',
+        'homeworld',
+        'created',
+        'edited',
+    ]
 
-    with open(settings.SWAPI_CSV_DIR / filename, 'w') as csvfile:
+    csvfile = settings.SWAPI_CSV_DIR / f'{filename}.csv'
+    homeworld_map = {}
+    
+    while True:
+        table = petl.fromdicts(r['results'])
 
-        total_count = r['count']
-        counter = 0
+        # Add date column
+        table = petl.addfield(table, 'date', lambda row: row.edited[:10])
 
-        field_names = list(r['results'][0].keys())
-        writer = csv.DictWriter(csvfile, fieldnames=field_names)
-        writer.writeheader()
-        writer.writerows(r['results'])
-        counter += len(r['results'])
+        # Iterate distinct homeworld values and fetch them
+        homeworld_urls = set(petl.values(table, 'homeworld'))
+        for homeworld_url in homeworld_urls:
+            if homeworld_url not in homeworld_map:
+                homeworld_map[homeworld_url] = requests.get(homeworld_url).json()['name']
+
+        # Resolve homeworld column
+        table = petl.convert(table, 'homeworld', homeworld_map)
+
+        # Drop unused fields
+        table = petl.cutout(table, 'films', 'species', 'vehicles', 'starships', 'url')
+
+        if not csvfile.exists():
+            petl.tocsv(table, csvfile)
+        else:
+            petl.appendcsv(table, csvfile)
         
-        while counter < total_count:
-            r = requests.get(r['next']).json()
-            writer.writerows(r['results'])
-            counter += len(r['results'])
+        if not r['next']:
+            break
+        r = requests.get(r['next']).json()
 
-    Collection.objects.create(filename=filename)
+    # Save collection entry
+    Collection.objects.create(filename=filename, name=name)
     
     return redirect('index')
