@@ -10,7 +10,6 @@ import csv
 from characters.models import Collection
 
 
-
 @require_http_methods(['GET'])
 def index(request, **kwargs):
     collections = Collection.objects.order_by('-created_at')
@@ -32,20 +31,6 @@ def fetch(request, **kwargs):
     filename = dt.strftime("%Y%m%d%H%M%S")
     name = dt.strftime("%b. %d, %Y, %I:%M %p")
 
-    field_names = [
-        'name',
-        'height',
-        'mass',
-        'hair_color',
-        'skin_color',
-        'eye_color', 
-        'birth_year',
-        'gender',
-        'homeworld',
-        'created',
-        'edited',
-    ]
-
     csvfile = settings.SWAPI_CSV_DIR / f'{filename}.csv'
     homeworld_map = {}
     
@@ -65,7 +50,16 @@ def fetch(request, **kwargs):
         table = petl.convert(table, 'homeworld', homeworld_map)
 
         # Drop unused fields
-        table = petl.cutout(table, 'films', 'species', 'vehicles', 'starships', 'url')
+        unused_fields = [
+            'films',
+            'species',
+            'vehicles',
+            'starships',
+            'created',
+            'edited',
+            'url',
+        ]
+        table = petl.cutout(table, *unused_fields)
 
         if not csvfile.exists():
             petl.tocsv(table, csvfile)
