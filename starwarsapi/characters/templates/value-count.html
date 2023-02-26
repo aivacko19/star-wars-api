@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<form action="" method="GET">
+    <h2><a href="{{ detail_url }}">{{ filename }}</a></h2>
+    {% if active_fields %}
+    <input type="hidden" name="active_fields" value="{{ active_fields_str }}">
+    {% endif %}
+    <div class="btn-group" role="group">
+        {% for field in fields %}
+        <button name="btn" 
+                value="{{ field }}" 
+                {% if field in active_fields %}
+                class="btn btn-outline-secondary"
+                {% else %}
+                class="btn btn-outline-primary"
+                {% endif %}
+                role="button">
+            {{ field }}
+        </button>
+        {% endfor %}
+    </div>
+<table class="table table-striped">
+    <thead>
+        <tr class="table-secondary">
+            {% for field in header %}
+            <th scope="col">{{ field }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            {% for value in row %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</form>
+{% endblock %}

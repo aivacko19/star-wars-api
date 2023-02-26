@@ -127,4 +127,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SWAPI collections
 
 SWAPI_CSV_DIR = BASE_DIR / 'collections'
-

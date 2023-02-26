@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<form action="fetch/" method="POST">
+<form action="{{ fetch_url }}" method="POST">
     {% csrf_token %}
     <h2>{{ title }} <button name="btn" value="fetch" role="button" class="btn btn-success">Fetch</a></h2>
 </form>
