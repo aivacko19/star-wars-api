@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<form action="" method="GET">
+    <h2>{{ filename }}</h2>
+<table class="table table-striped">
+    <thead>
+        <tr class="table-secondary">
+            {% for field in header %}
+            <th scope="col">{{ field }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            {% for value in row %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<input type="hidden" name="num" value="{{ num }}">
+<button name="btn" value="load" role="button" class="btn btn-outline-primary">Load more</a>
+</form>
+{% endblock %}

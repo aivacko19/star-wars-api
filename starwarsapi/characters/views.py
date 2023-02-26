@@ -5,19 +5,22 @@ from django.conf import settings
 import requests
 from datetime import datetime
 import petl
-import csv
 
 from characters.models import Collection
 
 
 @require_http_methods(['GET'])
-def index(request, **kwargs):
+def index(request, *args, **kwargs):
     collections = Collection.objects.order_by('-created_at')
-    return render(request, "index.html", {"title": "Collections", "collections": collections})
+    data = {
+        'title': "Collections",
+        'collections': collections,
+    }
+    return render(request, "index.html", data)
 
 
 @require_http_methods(['POST'])
-def fetch(request, **kwargs):
+def fetch(request, *args, **kwargs):
 
     url = "https://swapi.dev/api/people"
     r = requests.get(url).json()
@@ -74,3 +77,23 @@ def fetch(request, **kwargs):
     Collection.objects.create(filename=filename, name=name)
     
     return redirect('index')
+
+
+@require_http_methods(['GET'])
+def detail(request, filename, *args, **kwargs):
+
+    csvfile = settings.SWAPI_CSV_DIR / f'{filename}.csv'
+    table = petl.fromcsv(csvfile)
+
+    num = int(request.GET.get('num', 10))
+    table = petl.head(table, n=num)
+    
+    data = {
+        'title': csvfile.name,
+        'filename': csvfile.name,
+        'header': petl.header(table),
+        'data': petl.data(table),
+        'num': num + 10, 
+    }
+    return render(request, "detail.html", data)
+
